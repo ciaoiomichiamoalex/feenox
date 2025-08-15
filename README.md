@@ -1,4 +1,4 @@
-# wheeck
+# feenox
 
 Python package for saving fees by downloading them from APIs.
 
