@@ -5,12 +5,12 @@ PATH_CFG = PATH_PRJ / 'config'
 PATH_LOG = PATH_PRJ / 'log'
 PATH_RES = PATH_PRJ / 'res'
 
-URL_LOGIN = None
-URL_TOLL_GROUPS = None
-URL_INVOICE_TOLLS = None
-URL_DAILY_TOLLS = None
-URL_DOCUMENTS = None
-URL_DOWNLOAD_DOCUMENT = None
+URL_LOGIN = 'https://lumesia.onelogin.com/oidc/2/token'
+URL_TOLL_GROUPS = 'https://my.lumesia.com/fai/api/api/public/ext/getTollGroups'
+URL_INVOICE_TOLLS = 'https://my.lumesia.com/fai/api/api/public/ext/searchTolls'
+URL_DAILY_TOLLS = 'https://my.lumesia.com/fai/api/api/public/ext/searchDailyTolls'
+URL_DOCUMENTS = 'https://my.lumesia.com/fai/api/api/public/ext/findDocuments'
+URL_DOWNLOAD_DOCUMENT = 'https://my.lumesia.com/fai/api/api/public/ext/downloadDocumentByUuid'
 
 QUERY_GET_TOLL_GROUPS = """\
     SELECT code

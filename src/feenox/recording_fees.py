@@ -14,6 +14,9 @@ logger = get_logger(PATH_LOG, __name__)
 
 @dataclass
 class Toll:
+    """
+    The Toll object represents all the information retrieved from daily and invoice tolling search.
+    """
     id: str
     toll_country: str
     toll_group: str
@@ -49,7 +52,10 @@ class Toll:
     global_identifier: str = field(init=False)
     recording_date: datetime
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
+        """
+        Generate the global identifier from the stored toll information passed to the class constructor.
+        """
         self.global_identifier = '#'.join(
             var.strftime('%Y%m%d%H%M%S')
             if isinstance(var, datetime)
@@ -82,6 +88,9 @@ class Toll:
 
 @dataclass
 class Document:
+    """
+    The Document object represents all the information retrieved from document search.
+    """
     id: str
     customer_code: str
     company_name: str
@@ -94,8 +103,10 @@ class Document:
 
 
 def save_toll_groups() -> None:
+    """
+    Saves all new toll groups retrieved from API call and not yet saved on database.
+    """
     querier: Querier = Querier(PATH_CFG, save_changes=True)
-
     response = feenox.get_toll_groups()
     toll_groups = [var.code for var in querier.run(QUERY_GET_TOLL_GROUPS)]
 
@@ -110,6 +121,14 @@ def save_toll_groups() -> None:
 
 def save_tolls(toll_genre: str,
                job_begin: datetime = datetime.now()) -> None:
+    """
+    Saves all tolls retrieved from API call by filtering on toll genre and by checking duplicates.
+
+    :param toll_genre: The toll genre that indicates daily (P) or invoice (D) tolls.
+    :type toll_genre: str
+    :param job_begin: The timestamp of the job starting.
+    :type job_begin: datetime
+    """
     querier: Querier = Querier(PATH_CFG, save_changes=True)
 
     date_from, current_date = querier.run(QUERY_GET_LAST_TOLL_DATE, toll_genre).fetch(Querier.FETCH_VAL), date.today()
@@ -128,6 +147,7 @@ def save_tolls(toll_genre: str,
                 else feenox.get_daily_tolls(tolls_date=(date_from, date_to)))
         logger.info('searching toll of genre %s from date %s to %s... found %d records.',
                     toll_genre, date_from, date_to, len(items))
+        # convert date field in datetime object and amount field in decimal object
         for item in items:
             toll: Toll = Toll(
                 id=item['id'],
@@ -167,8 +187,10 @@ def save_tolls(toll_genre: str,
 
             is_duplicate = querier.run(QUERY_CHECK_DUPLICATE, toll.id, toll.global_identifier).fetch(Querier.FETCH_ONE)
             if is_duplicate.nr_id:
+                # duplicate on id field is ok, means that row is already saved
                 logger.warning('discarding toll for error on CHECK_DUPLICATE... id already saved! (%s)', toll.id)
             elif is_duplicate.nr_global_identifier:
+                # duplicate on global identifier means that row is really a duplicate
                 logger.error('discarding toll for error on CHECK_DUPLICATE... global identifier already saved! (%s)', toll.global_identifier)
             elif querier.run(QUERY_INSERT_TOLL, *astuple(toll)).rows != 1:
                 logger.critical('error on saving toll record with id %s... check the database connection!', toll.id)
@@ -180,16 +202,28 @@ def save_tolls(toll_genre: str,
 def save_documents(document_type: str,
                    document_category: str = None,
                    job_begin: datetime = datetime.now()) -> None:
+    """
+    Saves and download all documents information from API call by filtering on document type and category.
+
+    :param document_type: The document type to be searched.
+    :type document_type: str
+    :param document_category: The document category to be searched.
+    :type document_category: str
+    :param job_begin: The timestamp of the job starting.
+    :type job_begin: datetime
+    """
     querier: Querier = Querier(PATH_CFG, save_changes=True)
     logger.info('starting search documents with type %s%s', document_type,
                 f' and category {document_category}' if document_category else '')
     response = feenox.get_documents(document_type, document_category)['documents']
     documents = [var.id for var in querier.run(QUERY_GET_DOCUMENTS)]
 
+    # saving only document not yet in database, by filtering on document id
     items = [item for item in response if item['documentId'] not in documents]
     if items: logger.info('found %d new documents %s', len(items), [item['documentId'] for item in items])
     else: logger.info('no new document found... %d records already saved on database', len(documents))
     for item in items:
+        # convert date field in date object
         document: Document = Document(
             id=item['documentId'],
             customer_code=item['customer'],

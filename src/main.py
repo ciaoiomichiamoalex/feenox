@@ -11,8 +11,11 @@ if __name__ == '__main__':
     try:
         feenox.save_toll_groups()
 
+        # save new daily tolls
         feenox.save_tolls('P', job_begin=job_begin)
+        # save new invoice tolls
         feenox.save_tolls('D', job_begin=job_begin)
 
+        # download invoice documents
         feenox.save_documents('FATTURA', job_begin=job_begin)
     except Exception: logger.exception('unhandled exception')

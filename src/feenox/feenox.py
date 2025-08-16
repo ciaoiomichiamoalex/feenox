@@ -14,6 +14,7 @@ class Feenox:
     """
     The Feenox object allow for downloading tolls detail and invoice documents.
     """
+    # _cache: save in cache the token to be reuse quickly during same run without make authentication call
     _cache: dict[str, Any] = {}
 
     _PATH_CFG: Path = None
@@ -33,12 +34,14 @@ class Feenox:
         if not Feenox._cache or force:
             cache = PATH_PRJ / '.cache'
 
+            # check if the cache file exists and his token is still valid
             if cache.is_file() and not force:
                 Feenox._cache = decode_json(cache)
                 Feenox._cache['expire'] = datetime.fromisoformat(Feenox._cache['expire'])
                 Feenox._check_token_expire(cfg_in)
             else:
                 cfg_in = Path(cfg_in).resolve()
+                # if input path is a directory search for default config filename
                 if cfg_in.is_dir():
                     cfg_in = cfg_in / 'feenox.json'
                 Feenox._PATH_CFG = cfg_in
@@ -274,6 +277,7 @@ class Feenox:
         )).raise_for_status()
 
         directory = Path(directory).resolve()
+        # input path must a directory, the filename will be got from response header
         fou = (directory if directory.is_dir() else directory.parent) / response.headers['x-filename']
         with open(fou, 'wb') as res:
             res.write(response.content)
