@@ -22,12 +22,14 @@ QUERY_INSERT_TOLL_GROUPS = """\
     VALUES (?, ?)
     ;
 """
+
 QUERY_GET_LAST_TOLL_DATE = """\
     SELECT MAX(exit_date) AS max_date
     FROM feenox.toll
     WHERE toll_genre = ?
     ;
 """
+
 QUERY_CHECK_DUPLICATE = """\
     SELECT COUNT(DISTINCT id) AS nr_id,
         COUNT(DISTINCT global_identifier) AS nr_global_identifier
@@ -36,6 +38,7 @@ QUERY_CHECK_DUPLICATE = """\
         OR global_identifier = ?
     ;
 """
+
 QUERY_INSERT_TOLL = """\
     INSERT INTO feenox.toll (
         id,
@@ -75,6 +78,7 @@ QUERY_INSERT_TOLL = """\
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ;
 """
+
 QUERY_GET_DOCUMENTS = """\
     SELECT id 
     FROM feenox.document
