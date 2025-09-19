@@ -18,4 +18,7 @@ if __name__ == '__main__':
 
         # download invoice documents
         feenox.save_documents('FATTURA', job_begin=job_begin)
+        feenox.save_documents('ALLEGATO_FATTURA', job_begin=job_begin)
+        feenox.save_documents('ALLEGATO_FATTURA_CSV', job_begin=job_begin)
+        feenox.save_documents('ALLEGATO_FATTURA_TXT', job_begin=job_begin)
     except Exception: logger.exception('unhandled exception')
