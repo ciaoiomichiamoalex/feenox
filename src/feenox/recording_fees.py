@@ -1,7 +1,6 @@
 from dataclasses import astuple, dataclass, field
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-from zoneinfo import ZoneInfo
 
 from core import Querier, get_logger
 from .constants import (PATH_CFG, PATH_LOG, PATH_RES, QUERY_CHECK_DUPLICATE, QUERY_GET_DOCUMENTS,
@@ -156,7 +155,7 @@ def save_tolls(toll_genre: str,
                 toll_group=item['toll_group_code'],
                 toll_genre=item['type'],
                 toll_source=item['filename'] if toll_genre == 'P' else None,
-                acquisition_date=datetime.fromisoformat(item['acquisition_date']).astimezone(ZoneInfo('Europe/Rome')),
+                acquisition_date=datetime.fromisoformat(item['acquisition_date']),
                 customer_code=item['customer_code'],
                 contract_code=item['contract_code'],
                 sign_of_transaction=item['sign_of_transaction'],
@@ -168,11 +167,10 @@ def save_tolls(toll_genre: str,
                 network_code=item['network_code'],
                 entry_gate_code=item['entry_global_gate_identifier'],
                 entry_gate_description=item['entry_global_gate_identifier_description'],
-                entry_date=(datetime.fromisoformat(item['entry_timestamp']).astimezone(ZoneInfo('Europe/Rome'))
-                            if item['entry_timestamp'] else None),
+                entry_date=(datetime.fromisoformat(item['entry_timestamp']) if item['entry_timestamp'] else None),
                 exit_gate_code=item['exit_global_gate_identifier'],
                 exit_gate_description=item['exit_global_gate_identifier_description'],
-                exit_date=datetime.fromisoformat(item['exit_timestamp']).astimezone(ZoneInfo('Europe/Rome')),
+                exit_date=datetime.fromisoformat(item['exit_timestamp']),
                 distance=Decimal(str(item['km'])) if item['km'] else None,
                 device_type=item['device_type'],
                 device_serial_number=item['obu'],
@@ -183,8 +181,7 @@ def save_tolls(toll_genre: str,
                 tariff_class=item['vehicle_tariff_class'],
                 invoice_article=item['invoice_article'] if toll_genre == 'D' else None,
                 invoice_number=item['invoice_nr'] if toll_genre == 'D' else None,
-                invoice_date=(datetime.fromisoformat(item['invoice_date']).astimezone(ZoneInfo('Europe/Rome'))
-                              if toll_genre == 'D' else None),
+                invoice_date=(datetime.fromisoformat(item['invoice_date']) if toll_genre == 'D' else None),
                 recording_date=job_begin
             )
 
